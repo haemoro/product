@@ -2,8 +2,6 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
-  profiles:
-    active: production
 
 logging:
   level:

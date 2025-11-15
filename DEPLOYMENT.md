@@ -19,7 +19,7 @@ SPRING_PROFILES_ACTIVE=production  # 프로파일
 
 1. `.env` 파일 생성:
 ```bash
-MONGODB_URI=mongodb+srv://sotti:sotti!!@cluster0.vrrqxcf.mongodb.net/sotti-product?appName=Cluster0
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?options
 ```
 
 2. 애플리케이션 실행:

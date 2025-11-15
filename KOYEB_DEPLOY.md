@@ -30,7 +30,7 @@ Build context: Root directory
 ### 5. 환경변수 설정
 **Environment Variables** 섹션에서:
 ```bash
-MONGODB_URI=mongodb+srv://sotti:sotti!!@cluster0.vrrqxcf.mongodb.net/sotti-product?appName=Cluster0
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?options
 SPRING_PROFILES_ACTIVE=production
 ```
 

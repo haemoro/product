@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: product
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/sotti-product}
+
+http:
+  timeout:
+    default: 30000

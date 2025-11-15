@@ -1,0 +1,25 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+  profiles:
+    active: production
+
+logging:
+  level:
+    org.springframework.security: INFO
+    com.sotti: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+server:
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

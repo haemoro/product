@@ -1,9 +1,11 @@
 spring:
+  profiles:
+    active: local
   application:
     name: product
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/sotti-product}
+      uri: mongodb://localhost:27017/sotti-produc
 
 http:
   timeout:

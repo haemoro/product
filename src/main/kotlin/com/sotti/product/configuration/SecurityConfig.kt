@@ -10,7 +10,7 @@ import org.springframework.web.cors.CorsConfigurationSource
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val corsConfigurationSource: CorsConfigurationSource
+    private val corsConfigurationSource: CorsConfigurationSource,
 ) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {

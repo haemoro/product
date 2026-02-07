@@ -1,19 +1,19 @@
 package com.sotti.product.domain
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "music_quiz")
 data class MusicQuiz(
     @Id
     val id: String? = null,
-    // 핵심 필드
-    val musicUrl: String, // 음원 URL
-    val answer: String, // 정답 텍스트
-    val imageUrl: String? = null, // 정답 이미지 URL (앨범커버, 캐릭터 등)
-    // 게임 정보
-    val title: String, // 문제 제목
-    val category: Category, // 카테고리 (동요, 애니OST 등)
+    val musicUrl: String,
+    val answer: String,
+    val imageUrl: String? = null,
+    val title: String,
+    @Indexed
+    val category: Category,
 )
 
 enum class Category {

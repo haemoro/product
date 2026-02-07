@@ -11,15 +11,18 @@ import com.sotti.product.dto.UpdateMusicQuizRequest
 import com.sotti.product.repository.MusicQuizRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.random.Random
 
 @Service
 @Transactional
 class MusicQuizService(
     private val musicQuizRepository: MusicQuizRepository,
+    private val mongoTemplate: MongoTemplate,
 ) {
     // 퀴즈 생성
     fun createQuiz(request: CreateMusicQuizRequest): MusicQuizResponse {
@@ -72,18 +75,21 @@ class MusicQuizService(
     // 랜덤 퀴즈 조회
     @Transactional(readOnly = true)
     fun getRandomQuiz(category: Category? = null): MusicQuizGameResponse {
-        val quizzes =
-            if (category != null) {
-                musicQuizRepository.findByCategory(category)
-            } else {
-                musicQuizRepository.findAll()
-            }
+        val operations =
+            mutableListOf<org.springframework.data.mongodb.core.aggregation.AggregationOperation>()
 
-        if (quizzes.isEmpty()) {
-            throw NoSuchElementException("조건에 맞는 퀴즈가 없습니다.")
+        if (category != null) {
+            operations.add(Aggregation.match(Criteria.where("category").`is`(category)))
         }
+        operations.add(Aggregation.sample(1))
 
-        val randomQuiz = quizzes[Random.nextInt(quizzes.size)]
+        val aggregation = Aggregation.newAggregation(operations)
+        val result = mongoTemplate.aggregate(aggregation, "music_quiz", MusicQuiz::class.java)
+
+        val randomQuiz =
+            result.mappedResults.firstOrNull()
+                ?: throw NoSuchElementException("조건에 맞는 퀴즈가 없습니다.")
+
         return MusicQuizGameResponse.from(randomQuiz)
     }
 

@@ -1,28 +1,41 @@
 package com.sotti.product.controller
 
 import com.sotti.product.dto.AppUserResponse
+import com.sotti.product.dto.CreateQuizCategoryRequest
+import com.sotti.product.dto.CreateQuizItemRequest
+import com.sotti.product.dto.QuizCategoryResponse
+import com.sotti.product.dto.QuizItemResponse
 import com.sotti.product.dto.UpdateAllowedCategoriesRequest
+import com.sotti.product.dto.UpdateQuizCategoryRequest
+import com.sotti.product.dto.UpdateQuizItemRequest
 import com.sotti.product.service.AppUserService
+import com.sotti.product.service.QuizCategoryService
+import com.sotti.product.service.QuizItemService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "Admin", description = "어드민 유저 관리 API")
+@Tag(name = "Admin", description = "어드민 API")
 @RestController
 @RequestMapping("/api/v1/admin")
 class AdminController(
     private val appUserService: AppUserService,
+    private val quizCategoryService: QuizCategoryService,
+    private val quizItemService: QuizItemService,
 ) {
     @Operation(summary = "전체 유저 목록", description = "등록된 전체 유저 목록을 조회합니다")
     @ApiResponse(responseCode = "200", description = "조회 성공")
@@ -83,5 +96,109 @@ class AdminController(
     ): ResponseEntity<AppUserResponse> {
         val response = appUserService.deactivateUser(id)
         return ResponseEntity.ok(response)
+    }
+
+    // ==================== 카테고리 관리 ====================
+
+    @Operation(summary = "전체 카테고리 목록", description = "삭제되지 않은 모든 카테고리를 조회합니다")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/quiz-categories")
+    fun getAllCategories(): ResponseEntity<List<QuizCategoryResponse>> {
+        val response = quizCategoryService.getAllCategories()
+        return ResponseEntity.ok(response)
+    }
+
+    @Operation(summary = "카테고리 단건 조회", description = "ID로 카테고리를 조회합니다")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/quiz-categories/{id}")
+    fun getCategoryById(
+        @Parameter(description = "카테고리 ID") @PathVariable id: String,
+    ): ResponseEntity<QuizCategoryResponse> {
+        val response = quizCategoryService.getCategoryById(id)
+        return ResponseEntity.ok(response)
+    }
+
+    @Operation(summary = "카테고리 생성", description = "새로운 퀴즈 카테고리를 생성합니다")
+    @ApiResponse(responseCode = "201", description = "생성 성공")
+    @PostMapping("/quiz-categories")
+    fun createCategory(
+        @Valid @RequestBody request: CreateQuizCategoryRequest,
+    ): ResponseEntity<QuizCategoryResponse> {
+        val response = quizCategoryService.createCategory(request)
+        return ResponseEntity.status(HttpStatus.CREATED).body(response)
+    }
+
+    @Operation(summary = "카테고리 수정", description = "기존 카테고리를 수정합니다")
+    @ApiResponse(responseCode = "200", description = "수정 성공")
+    @PutMapping("/quiz-categories/{id}")
+    fun updateCategory(
+        @Parameter(description = "카테고리 ID") @PathVariable id: String,
+        @Valid @RequestBody request: UpdateQuizCategoryRequest,
+    ): ResponseEntity<QuizCategoryResponse> {
+        val response = quizCategoryService.updateCategory(id, request)
+        return ResponseEntity.ok(response)
+    }
+
+    @Operation(summary = "카테고리 삭제", description = "카테고리를 소프트 삭제합니다")
+    @ApiResponse(responseCode = "204", description = "삭제 성공")
+    @DeleteMapping("/quiz-categories/{id}")
+    fun deleteCategory(
+        @Parameter(description = "카테고리 ID") @PathVariable id: String,
+    ): ResponseEntity<Void> {
+        quizCategoryService.deleteCategory(id)
+        return ResponseEntity.noContent().build()
+    }
+
+    // ==================== 퀴즈 아이템 관리 ====================
+
+    @Operation(summary = "카테고리별 아이템 목록", description = "특정 카테고리의 퀴즈 아이템을 조회합니다")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/quiz-items")
+    fun getItemsByCategoryId(
+        @Parameter(description = "카테고리 ID") @RequestParam categoryId: String,
+    ): ResponseEntity<List<QuizItemResponse>> {
+        val response = quizItemService.getItemsByCategoryId(categoryId)
+        return ResponseEntity.ok(response)
+    }
+
+    @Operation(summary = "아이템 단건 조회", description = "ID로 퀴즈 아이템을 조회합니다")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/quiz-items/{id}")
+    fun getItemById(
+        @Parameter(description = "아이템 ID") @PathVariable id: String,
+    ): ResponseEntity<QuizItemResponse> {
+        val response = quizItemService.getItemById(id)
+        return ResponseEntity.ok(response)
+    }
+
+    @Operation(summary = "아이템 생성", description = "새로운 퀴즈 아이템을 생성합니다")
+    @ApiResponse(responseCode = "201", description = "생성 성공")
+    @PostMapping("/quiz-items")
+    fun createItem(
+        @Valid @RequestBody request: CreateQuizItemRequest,
+    ): ResponseEntity<QuizItemResponse> {
+        val response = quizItemService.createItem(request)
+        return ResponseEntity.status(HttpStatus.CREATED).body(response)
+    }
+
+    @Operation(summary = "아이템 수정", description = "기존 퀴즈 아이템을 수정합니다")
+    @ApiResponse(responseCode = "200", description = "수정 성공")
+    @PutMapping("/quiz-items/{id}")
+    fun updateItem(
+        @Parameter(description = "아이템 ID") @PathVariable id: String,
+        @Valid @RequestBody request: UpdateQuizItemRequest,
+    ): ResponseEntity<QuizItemResponse> {
+        val response = quizItemService.updateItem(id, request)
+        return ResponseEntity.ok(response)
+    }
+
+    @Operation(summary = "아이템 삭제", description = "퀴즈 아이템을 소프트 삭제합니다")
+    @ApiResponse(responseCode = "204", description = "삭제 성공")
+    @DeleteMapping("/quiz-items/{id}")
+    fun deleteItem(
+        @Parameter(description = "아이템 ID") @PathVariable id: String,
+    ): ResponseEntity<Void> {
+        quizItemService.deleteItem(id)
+        return ResponseEntity.noContent().build()
     }
 }

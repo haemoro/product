@@ -52,6 +52,14 @@ class QuizCategoryController(
         return ResponseEntity.ok(response)
     }
 
+    @Operation(summary = "전체 카테고리 목록 조회 (어드민)", description = "삭제되지 않은 모든 카테고리를 조회합니다")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/all")
+    fun getAllCategories(): ResponseEntity<List<QuizCategoryResponse>> {
+        val response = quizCategoryService.getAllCategories()
+        return ResponseEntity.ok(response)
+    }
+
     @Operation(summary = "카테고리 단건 조회", description = "ID로 카테고리를 조회합니다")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "조회 성공"),

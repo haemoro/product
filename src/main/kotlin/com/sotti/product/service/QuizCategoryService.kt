@@ -44,6 +44,13 @@ class QuizCategoryService(
         return filtered.map { QuizCategoryResponse.from(it) }
     }
 
+    fun getAllCategories(): List<QuizCategoryResponse> =
+        quizCategoryRepository
+            .findAll()
+            .filter { it.deletedAt == null }
+            .sortedBy { it.displayOrder }
+            .map { QuizCategoryResponse.from(it) }
+
     fun getCategoryById(id: String): QuizCategoryResponse {
         val category = findActiveById(id)
         return QuizCategoryResponse.from(category)

@@ -43,3 +43,6 @@ out/
 .env
 .env.local
 .env.production
+
+### Local Config ###
+src/main/resources/application-local.yaml

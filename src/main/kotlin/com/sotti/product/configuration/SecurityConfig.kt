@@ -25,12 +25,12 @@ class SecurityConfig(
         http
             .cors { it.configurationSource(corsConfigurationSource) }
             .csrf { it.disable() }
-            .authorizeHttpRequests { auth ->
-                auth.anyRequest().permitAll()
-            }.addFilterBefore(
+            .addFilterBefore(
                 ApiKeyAuthFilter(appUserService, adminApiKey ?: "", objectMapper),
                 UsernamePasswordAuthenticationFilter::class.java,
-            )
+            ).authorizeHttpRequests { auth ->
+                auth.anyRequest().permitAll()
+            }
         return http.build()
     }
 }

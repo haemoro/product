@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "QuizCategory", description = "소띠퀴즈 카테고리 API")
@@ -72,6 +73,23 @@ class QuizCategoryController(
         @Valid @RequestBody request: UpdateQuizCategoryRequest,
     ): ResponseEntity<QuizCategoryResponse> {
         val response = quizCategoryService.updateCategory(id, request)
+        return ResponseEntity.ok(response)
+    }
+
+    @Operation(
+        summary = "카테고리 이미지를 아이템 이미지로 변경",
+        description = "카테고리 이름과 아이템 이름을 받아 해당 아이템의 이미지를 카테고리 대표 이미지로 설정합니다",
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "수정 성공"),
+        ApiResponse(responseCode = "404", description = "카테고리 또는 아이템을 찾을 수 없음"),
+    )
+    @PutMapping("/image-from-item")
+    fun updateCategoryImageByItemName(
+        @Parameter(description = "카테고리 이름") @RequestParam categoryName: String,
+        @Parameter(description = "아이템 이름") @RequestParam itemName: String,
+    ): ResponseEntity<QuizCategoryResponse> {
+        val response = quizCategoryService.updateCategoryImageByItemName(categoryName, itemName)
         return ResponseEntity.ok(response)
     }
 

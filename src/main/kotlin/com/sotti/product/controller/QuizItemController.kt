@@ -76,6 +76,19 @@ class QuizItemController(
         return ResponseEntity.ok(response)
     }
 
+    @Operation(summary = "이름으로 아이템 조회", description = "이름으로 퀴즈 아이템을 조회합니다")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "조회 성공"),
+        ApiResponse(responseCode = "404", description = "아이템을 찾을 수 없음"),
+    )
+    @GetMapping("/search")
+    fun getItemByName(
+        @Parameter(description = "아이템 이름") @RequestParam name: String,
+    ): ResponseEntity<QuizItemResponse> {
+        val response = quizItemService.getItemByName(name)
+        return ResponseEntity.ok(response)
+    }
+
     @Operation(summary = "아이템 단건 조회", description = "ID로 퀴즈 아이템을 조회합니다")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "조회 성공"),

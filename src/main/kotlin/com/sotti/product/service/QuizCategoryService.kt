@@ -5,6 +5,7 @@ import com.sotti.product.dto.CreateQuizCategoryRequest
 import com.sotti.product.dto.QuizCategoryResponse
 import com.sotti.product.dto.UpdateQuizCategoryRequest
 import com.sotti.product.repository.QuizCategoryRepository
+import com.sotti.product.repository.QuizItemRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -13,6 +14,7 @@ import java.time.LocalDateTime
 @Transactional(readOnly = true)
 class QuizCategoryService(
     private val quizCategoryRepository: QuizCategoryRepository,
+    private val quizItemRepository: QuizItemRepository,
 ) {
     @Transactional
     fun createCategory(request: CreateQuizCategoryRequest): QuizCategoryResponse {
@@ -82,6 +84,21 @@ class QuizCategoryService(
             )
         val saved = quizCategoryRepository.save(category)
         return QuizCategoryResponse.from(saved)
+    }
+
+    @Transactional
+    fun updateCategoryImageByItemName(
+        categoryName: String,
+        itemName: String,
+    ): QuizCategoryResponse {
+        val category =
+            quizCategoryRepository.findByNameAndDeletedAtIsNull(categoryName)
+                ?: throw NoSuchElementException("카테고리를 찾을 수 없습니다. 이름: $categoryName")
+        val item =
+            quizItemRepository.findByNameAndDeletedAtIsNull(itemName)
+                ?: throw NoSuchElementException("아이템을 찾을 수 없습니다. 이름: $itemName")
+        val updated = quizCategoryRepository.save(category.copy(imageUrl = item.imageUrl))
+        return QuizCategoryResponse.from(updated)
     }
 
     private fun findActiveById(id: String): QuizCategory =

@@ -11,4 +11,6 @@ interface QuizItemRepository : MongoRepository<QuizItem, String> {
     fun findByIdAndDeletedAtIsNull(id: String): QuizItem?
 
     fun findByDeletedAtIsNull(): List<QuizItem>
+
+    fun findByNameAndDeletedAtIsNull(name: String): QuizItem?
 }

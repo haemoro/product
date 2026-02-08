@@ -75,6 +75,13 @@ class QuizItemService(
         return QuizItemResponse.from(item)
     }
 
+    fun getItemByName(name: String): QuizItemResponse {
+        val item =
+            quizItemRepository.findByNameAndDeletedAtIsNull(name)
+                ?: throw NoSuchElementException("퀴즈 아이템을 찾을 수 없습니다. 이름: $name")
+        return QuizItemResponse.from(item)
+    }
+
     fun getRandomItem(categoryId: String?): QuizItemResponse {
         val criteria = Criteria.where("deletedAt").`is`(null)
         if (categoryId != null) {

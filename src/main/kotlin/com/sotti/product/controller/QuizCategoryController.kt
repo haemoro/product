@@ -1,5 +1,6 @@
 package com.sotti.product.controller
 
+import com.sotti.product.domain.AppUser
 import com.sotti.product.dto.CreateQuizCategoryRequest
 import com.sotti.product.dto.QuizCategoryResponse
 import com.sotti.product.dto.UpdateQuizCategoryRequest
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,11 +43,12 @@ class QuizCategoryController(
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
-    @Operation(summary = "카테고리 목록 조회", description = "노출 가능한 카테고리 목록을 정렬 순서대로 조회합니다")
+    @Operation(summary = "카테고리 목록 조회", description = "유저에게 허용된 카테고리 목록을 정렬 순서대로 조회합니다")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping
-    fun getVisibleCategories(): ResponseEntity<List<QuizCategoryResponse>> {
-        val response = quizCategoryService.getVisibleCategories()
+    fun getVisibleCategories(request: HttpServletRequest): ResponseEntity<List<QuizCategoryResponse>> {
+        val user = request.getAttribute("currentUser") as? AppUser
+        val response = quizCategoryService.getVisibleCategories(user)
         return ResponseEntity.ok(response)
     }
 
@@ -84,7 +87,7 @@ class QuizCategoryController(
         ApiResponse(responseCode = "200", description = "수정 성공"),
         ApiResponse(responseCode = "404", description = "카테고리 또는 아이템을 찾을 수 없음"),
     )
-    @PutMapping("/image-from-item")
+    @PutMapping("/4image-from-item")
     fun updateCategoryImageByItemName(
         @Parameter(description = "카테고리 이름") @RequestParam categoryName: String,
         @Parameter(description = "아이템 이름") @RequestParam itemName: String,

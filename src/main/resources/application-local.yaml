@@ -1,0 +1,23 @@
+spring:
+  data:
+    mongodb:
+      uri: "mongodb+srv://sotti:sotti!!@cluster0.vrrqxcf.mongodb.net/sotti-product?appName=Cluster0"
+
+logging:
+  level:
+    org.springframework.security: INFO
+    com.sotti: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+server:
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

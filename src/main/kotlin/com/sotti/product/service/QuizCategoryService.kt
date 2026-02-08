@@ -1,5 +1,6 @@
 package com.sotti.product.service
 
+import com.sotti.product.domain.AppUser
 import com.sotti.product.domain.QuizCategory
 import com.sotti.product.dto.CreateQuizCategoryRequest
 import com.sotti.product.dto.QuizCategoryResponse
@@ -28,10 +29,20 @@ class QuizCategoryService(
         return QuizCategoryResponse.from(saved)
     }
 
-    fun getVisibleCategories(): List<QuizCategoryResponse> =
-        quizCategoryRepository
-            .findByVisibleTrueAndDeletedAtIsNullOrderByDisplayOrderAsc()
-            .map { QuizCategoryResponse.from(it) }
+    fun getVisibleCategories(user: AppUser? = null): List<QuizCategoryResponse> {
+        val categories =
+            quizCategoryRepository
+                .findByVisibleTrueAndDeletedAtIsNullOrderByDisplayOrderAsc()
+
+        val filtered =
+            if (user != null && user.allowedCategoryIds.isNotEmpty()) {
+                categories.filter { it.id in user.allowedCategoryIds }
+            } else {
+                categories
+            }
+
+        return filtered.map { QuizCategoryResponse.from(it) }
+    }
 
     fun getCategoryById(id: String): QuizCategoryResponse {
         val category = findActiveById(id)

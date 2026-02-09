@@ -21,3 +21,6 @@ management:
   endpoint:
     health:
       show-details: always
+
+app:
+  admin-api-key: sotti:63C5942B-9FB6-4D65-995A-100E6CF8D5DF

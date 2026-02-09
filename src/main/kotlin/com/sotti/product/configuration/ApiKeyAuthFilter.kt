@@ -17,6 +17,8 @@ class ApiKeyAuthFilter(
         private val PUBLIC_PATHS =
             listOf(
                 "/api/v1/users/register",
+                "/api/v1/music-quiz/question",
+                "/api/v1/music-quiz/answer",
                 "/actuator/health",
                 "/swagger-ui",
                 "/v3/api-docs",
@@ -65,7 +67,7 @@ class ApiKeyAuthFilter(
 
     private fun isPublicPath(path: String): Boolean = PUBLIC_PATHS.any { path.startsWith(it) }
 
-    private fun isAdminPath(path: String): Boolean = path.startsWith("/api/v1/admin")
+    private fun isAdminPath(path: String): Boolean = path.startsWith("/api/v1/admin") || path.startsWith("/api/v1/music-quiz/admin")
 
     private fun handleAdminAuth(
         request: HttpServletRequest,

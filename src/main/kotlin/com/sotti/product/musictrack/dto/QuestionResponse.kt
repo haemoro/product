@@ -4,6 +4,7 @@ data class QuestionResponse(
     val questionToken: String,
     val previewSeconds: Int,
     val youtube: YoutubeInfo,
+    val title: String,
     val choices: List<ChoiceItem>,
 )
 
@@ -15,4 +16,5 @@ data class YoutubeInfo(
 data class ChoiceItem(
     val trackId: String,
     val thumbnailUrl: String,
+    val title: String,
 )

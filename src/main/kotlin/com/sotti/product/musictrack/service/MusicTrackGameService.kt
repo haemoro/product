@@ -67,8 +67,10 @@ class MusicTrackGameService(
                     ChoiceItem(
                         trackId = track.id!!,
                         thumbnailUrl = track.thumbnailUrl,
+                        title = track.title,
                     )
                 },
+            title = correctTrack.title,
         )
     }
 

@@ -18,7 +18,7 @@ data class MusicTrack(
     val startSeconds: Int,
     val thumbnailUrl: String,
     val status: TrackStatus = TrackStatus.ACTIVE,
-    val title: String? = null,
+    val title: String,
     val category: String? = null,
     val difficulty: String? = null,
     @CreatedDate

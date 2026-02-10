@@ -8,7 +8,7 @@ data class CreateMusicTrackRequest(
     val youtubeVideoId: String,
     @field:PositiveOrZero(message = "startSeconds는 0 이상이어야 합니다")
     val startSeconds: Int,
-    val title: String? = null,
+    val title: String,
     val category: String? = null,
     val difficulty: String? = null,
 )

@@ -32,6 +32,7 @@ class MongoConfiguration(
                 pool
                     .minSize(10)
                     .maxSize(30)
+                    .maxWaitTime(10, TimeUnit.SECONDS)
                     .maxConnectionIdleTime(5, TimeUnit.MINUTES)
                     .maxConnectionLifeTime(30, TimeUnit.MINUTES)
             }

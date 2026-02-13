@@ -30,6 +30,7 @@ object DependencyVersions {
     const val SPRINGDOC_OPENAPI = "2.8.11"
     const val KOTEST = "5.9.1"
     const val SLACK_CLIENT = "1.45.3"
+    const val AWS_SDK = "2.25.27"
 }
 
 java {
@@ -85,6 +86,9 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
 
     implementation("org.apache.poi:poi-ooxml:5.4.0")
+
+    implementation(platform("software.amazon.awssdk:bom:${DependencyVersions.AWS_SDK}"))
+    implementation("software.amazon.awssdk:s3")
 
     runtimeOnly("net.logstash.logback:logstash-logback-encoder:8.0")
 

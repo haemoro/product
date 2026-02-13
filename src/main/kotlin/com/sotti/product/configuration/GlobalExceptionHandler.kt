@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import org.springframework.web.multipart.MaxUploadSizeExceededException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -70,6 +71,17 @@ class GlobalExceptionHandler {
                 ErrorResponse(
                     status = HttpStatus.BAD_REQUEST.value(),
                     message = "'${e.value}'은(는) 유효하지 않은 값입니다.",
+                ),
+            )
+
+    @ExceptionHandler(MaxUploadSizeExceededException::class)
+    fun handleMaxUploadSize(e: MaxUploadSizeExceededException): ResponseEntity<ErrorResponse> =
+        ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                ErrorResponse(
+                    status = HttpStatus.BAD_REQUEST.value(),
+                    message = "파일 크기가 허용 범위를 초과했습니다. 최대 5MB까지 업로드 가능합니다.",
                 ),
             )
 

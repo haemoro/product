@@ -1,6 +1,7 @@
 package com.sotti.product.service
 
 import com.sotti.product.configuration.R2Properties
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.core.sync.RequestBody
@@ -9,6 +10,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.util.UUID
 
 @Service
+@ConditionalOnBean(S3Client::class)
 class ImageUploadService(
     private val s3Client: S3Client,
     private val r2Properties: R2Properties,

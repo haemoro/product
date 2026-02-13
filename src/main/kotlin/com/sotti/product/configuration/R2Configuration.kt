@@ -1,5 +1,6 @@
 package com.sotti.product.configuration
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,6 +12,7 @@ import java.net.URI
 
 @Configuration
 @EnableConfigurationProperties(R2Properties::class)
+@ConditionalOnProperty(prefix = "app.r2", name = ["endpoint"])
 class R2Configuration(
     private val r2Properties: R2Properties,
 ) {

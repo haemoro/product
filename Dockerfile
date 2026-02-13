@@ -16,8 +16,9 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 CMD ["java", \
-  "-Xmx384m", \
-  "-Xms256m", \
+  "-Xmx512m", \
+  "-Xms512m", \
   "-XX:+UseG1GC", \
-  "-XX:MaxMetaspaceSize=96m", \
+  "-XX:MaxMetaspaceSize=128m", \
+  "-XX:+UseStringDeduplication", \
   "-jar", "app.jar"]

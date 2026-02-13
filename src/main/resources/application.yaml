@@ -6,9 +6,19 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/sotti-produc
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
 
 app:
   admin-api-key: ${ADMIN_API_KEY:}
+  r2:
+    access-key: ${R2_ACCESS_KEY:}
+    secret-key: ${R2_SECRET_KEY:}
+    endpoint: ${R2_ENDPOINT:}
+    bucket: ${R2_BUCKET:}
+    public-base-url: ${R2_PUBLIC_BASE_URL:}
 
 http:
   timeout:

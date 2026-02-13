@@ -16,5 +16,6 @@ data class YoutubeInfo(
 data class ChoiceItem(
     val trackId: String,
     val thumbnailUrl: String,
+    val imageUrl: String?,
     val title: String,
 )

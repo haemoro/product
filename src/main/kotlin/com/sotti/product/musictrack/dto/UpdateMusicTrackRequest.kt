@@ -8,6 +8,7 @@ data class UpdateMusicTrackRequest(
     val thumbnailUrl: String? = null,
     val status: TrackStatus? = null,
     val title: String? = null,
+    val imageUrl: String? = null,
     val category: String? = null,
     val difficulty: String? = null,
 )

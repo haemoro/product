@@ -9,6 +9,7 @@ data class CreateMusicTrackRequest(
     @field:PositiveOrZero(message = "startSeconds는 0 이상이어야 합니다")
     val startSeconds: Int,
     val title: String,
+    val imageUrl: String? = null,
     val category: String? = null,
     val difficulty: String? = null,
 )

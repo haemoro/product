@@ -32,6 +32,7 @@ class MusicTrackService(
                 startSeconds = request.startSeconds,
                 thumbnailUrl = thumbnailUrlOf(request.youtubeVideoId),
                 title = request.title,
+                imageUrl = request.imageUrl,
                 category = request.category,
                 difficulty = request.difficulty,
             )
@@ -79,6 +80,7 @@ class MusicTrackService(
                 thumbnailUrl = request.thumbnailUrl ?: thumbnailUrlOf(newVideoId),
                 status = request.status ?: track.status,
                 title = request.title ?: track.title,
+                imageUrl = request.imageUrl ?: track.imageUrl,
                 category = request.category ?: track.category,
                 difficulty = request.difficulty ?: track.difficulty,
             )

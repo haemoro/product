@@ -41,7 +41,7 @@ class AdminController(
     private val appUserService: AppUserService,
     private val quizCategoryService: QuizCategoryService,
     private val quizItemService: QuizItemService,
-    private val imageUploadService: ImageUploadService,
+    private val imageUploadService: ImageUploadService? = null,
 ) {
     @Operation(summary = "전체 유저 목록", description = "등록된 전체 유저 목록을 조회합니다")
     @ApiResponse(responseCode = "200", description = "조회 성공")
@@ -220,7 +220,10 @@ class AdminController(
         @Parameter(description = "이미지 파일 (JPEG, PNG, WebP, GIF)") @RequestPart file: MultipartFile,
         @Parameter(description = "저장 폴더 (기본값: images)") @RequestParam(defaultValue = "images") folder: String,
     ): ResponseEntity<ImageUploadResponse> {
-        val imageUrl = imageUploadService.upload(file, folder)
+        val service =
+            imageUploadService
+                ?: throw IllegalStateException("이미지 업로드 기능이 설정되지 않았습니다. R2 환경변수를 확인해주세요.")
+        val imageUrl = service.upload(file, folder)
         return ResponseEntity.ok(ImageUploadResponse(imageUrl))
     }
 }

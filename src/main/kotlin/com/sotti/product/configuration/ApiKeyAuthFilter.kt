@@ -19,6 +19,7 @@ class ApiKeyAuthFilter(
                 "/api/v1/users/register",
                 "/api/v1/music-quiz/question",
                 "/api/v1/music-quiz/answer",
+                "/api/v1/admin/auth/login",
                 "/actuator/health",
                 "/swagger-ui",
                 "/v3/api-docs",

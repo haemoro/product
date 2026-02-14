@@ -1,5 +1,6 @@
 package com.sotti.product.service
 
+import com.luciad.imageio.webp.WebPWriteParam
 import com.sotti.product.configuration.R2Properties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.stereotype.Service
@@ -7,7 +8,15 @@ import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import java.awt.Color
+import java.awt.RenderingHints
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.util.UUID
+import javax.imageio.IIOImage
+import javax.imageio.ImageIO
+import javax.imageio.ImageWriteParam
+import javax.imageio.stream.MemoryCacheImageOutputStream
 
 @Service
 @ConditionalOnBean(S3Client::class)
@@ -24,29 +33,88 @@ class ImageUploadService(
                 "image/gif",
             )
         private const val MAX_FILE_SIZE = 5L * 1024 * 1024
+        private const val WEBP_QUALITY = 0.8f
     }
 
     fun upload(
         file: MultipartFile,
         folder: String,
+        width: Int? = null,
+        height: Int? = null,
     ): String {
         validate(file)
 
-        val extension = extractExtension(file.originalFilename)
-        val key = "$folder/${UUID.randomUUID()}.$extension"
+        val originalImage =
+            ImageIO.read(file.inputStream)
+                ?: throw IllegalArgumentException("이미지를 읽을 수 없습니다.")
+
+        val resizedImage =
+            if (width != null && height != null) {
+                resizeImage(originalImage, width, height)
+            } else {
+                toRgb(originalImage)
+            }
+
+        val webpBytes = convertToWebP(resizedImage)
+        val key = "$folder/${UUID.randomUUID()}.webp"
 
         val putRequest =
             PutObjectRequest
                 .builder()
                 .bucket(r2Properties.bucket)
                 .key(key)
-                .contentType(file.contentType)
+                .contentType("image/webp")
                 .build()
 
-        s3Client.putObject(putRequest, RequestBody.fromInputStream(file.inputStream, file.size))
+        s3Client.putObject(putRequest, RequestBody.fromBytes(webpBytes))
 
         val baseUrl = r2Properties.publicBaseUrl.trimEnd('/')
         return "$baseUrl/$key"
+    }
+
+    private fun resizeImage(
+        original: BufferedImage,
+        targetWidth: Int,
+        targetHeight: Int,
+    ): BufferedImage {
+        val resized = BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB)
+        val g2d = resized.createGraphics()
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g2d.color = Color.WHITE
+        g2d.fillRect(0, 0, targetWidth, targetHeight)
+        g2d.drawImage(original, 0, 0, targetWidth, targetHeight, null)
+        g2d.dispose()
+        return resized
+    }
+
+    private fun toRgb(image: BufferedImage): BufferedImage {
+        if (image.type == BufferedImage.TYPE_INT_RGB) return image
+        val rgb = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_RGB)
+        val g2d = rgb.createGraphics()
+        g2d.color = Color.WHITE
+        g2d.fillRect(0, 0, image.width, image.height)
+        g2d.drawImage(image, 0, 0, null)
+        g2d.dispose()
+        return rgb
+    }
+
+    private fun convertToWebP(image: BufferedImage): ByteArray {
+        val output = ByteArrayOutputStream()
+        val writer = ImageIO.getImageWritersByMIMEType("image/webp").next()
+        val writeParam = WebPWriteParam(writer.locale)
+        writeParam.compressionMode = ImageWriteParam.MODE_EXPLICIT
+        writeParam.compressionType = writeParam.compressionTypes[WebPWriteParam.LOSSY_COMPRESSION]
+        writeParam.compressionQuality = WEBP_QUALITY
+
+        MemoryCacheImageOutputStream(output).use { imageOutput ->
+            writer.output = imageOutput
+            writer.write(null, IIOImage(image, null, null), writeParam)
+        }
+        writer.dispose()
+
+        return output.toByteArray()
     }
 
     private fun validate(file: MultipartFile) {
@@ -55,11 +123,5 @@ class ImageUploadService(
         require(file.contentType in ALLOWED_CONTENT_TYPES) {
             "허용되지 않는 파일 형식입니다. JPEG, PNG, WebP, GIF만 가능합니다."
         }
-    }
-
-    private fun extractExtension(filename: String?): String {
-        val ext = filename?.substringAfterLast('.', "")?.lowercase() ?: ""
-        require(ext.isNotBlank()) { "파일 확장자를 확인할 수 없습니다." }
-        return ext
     }
 }

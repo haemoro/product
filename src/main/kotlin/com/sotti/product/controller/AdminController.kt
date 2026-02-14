@@ -219,11 +219,13 @@ class AdminController(
     fun uploadImage(
         @Parameter(description = "이미지 파일 (JPEG, PNG, WebP, GIF)") @RequestPart file: MultipartFile,
         @Parameter(description = "저장 폴더 (기본값: images)") @RequestParam(defaultValue = "images") folder: String,
+        @Parameter(description = "리사이즈 너비 (px)") @RequestParam(required = false) width: Int?,
+        @Parameter(description = "리사이즈 높이 (px)") @RequestParam(required = false) height: Int?,
     ): ResponseEntity<ImageUploadResponse> {
         val service =
             imageUploadService
                 ?: throw IllegalStateException("이미지 업로드 기능이 설정되지 않았습니다. R2 환경변수를 확인해주세요.")
-        val imageUrl = service.upload(file, folder)
+        val imageUrl = service.upload(file, folder, width, height)
         return ResponseEntity.ok(ImageUploadResponse(imageUrl))
     }
 }

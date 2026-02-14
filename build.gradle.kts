@@ -90,6 +90,8 @@ dependencies {
     implementation(platform("software.amazon.awssdk:bom:${DependencyVersions.AWS_SDK}"))
     implementation("software.amazon.awssdk:s3")
 
+    implementation("org.sejda.imageio:webp-imageio:0.1.6")
+
     runtimeOnly("net.logstash.logback:logstash-logback-encoder:8.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

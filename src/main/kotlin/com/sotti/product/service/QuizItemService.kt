@@ -1,5 +1,7 @@
 package com.sotti.product.service
 
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
 import com.sotti.product.domain.Question
 import com.sotti.product.domain.QuizItem
 import com.sotti.product.dto.CreateQuizItemPayload
@@ -13,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 @Service
 @Transactional(readOnly = true)
@@ -20,6 +23,13 @@ class QuizItemService(
     private val quizItemRepository: QuizItemRepository,
     private val mongoTemplate: MongoTemplate,
 ) {
+    private val itemsByCategoryCache: Cache<String, List<QuizItem>> =
+        Caffeine
+            .newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .maximumSize(50)
+            .build()
+
     @Transactional
     fun createItem(request: CreateQuizItemRequest): QuizItemResponse {
         val item =
@@ -37,6 +47,7 @@ class QuizItemService(
                     },
             )
         val saved = quizItemRepository.save(item)
+        evictCache()
         return QuizItemResponse.from(saved)
     }
 
@@ -62,13 +73,17 @@ class QuizItemService(
                 )
             }
         val saved = quizItemRepository.saveAll(quizItems)
+        evictCache()
         return saved.map { QuizItemResponse.from(it) }
     }
 
-    fun getItemsByCategoryId(categoryId: String): List<QuizItemResponse> =
-        quizItemRepository
-            .findByCategoryIdAndDeletedAtIsNull(categoryId)
-            .map { QuizItemResponse.from(it) }
+    fun getItemsByCategoryId(categoryId: String): List<QuizItemResponse> {
+        val items =
+            itemsByCategoryCache.get(categoryId) {
+                quizItemRepository.findByCategoryIdAndDeletedAtIsNull(categoryId)
+            }!!
+        return items.map { QuizItemResponse.from(it) }
+    }
 
     fun getItemById(id: String): QuizItemResponse {
         val item = findActiveById(id)
@@ -123,6 +138,7 @@ class QuizItemService(
                     } ?: item.questions,
             )
         val saved = quizItemRepository.save(updated)
+        evictCache()
         return QuizItemResponse.from(saved)
     }
 
@@ -130,9 +146,14 @@ class QuizItemService(
     fun deleteItem(id: String) {
         val item = findActiveById(id)
         quizItemRepository.save(item.copy(deletedAt = LocalDateTime.now()))
+        evictCache()
     }
 
     private fun findActiveById(id: String): QuizItem =
         quizItemRepository.findByIdAndDeletedAtIsNull(id)
             ?: throw NoSuchElementException("퀴즈 아이템을 찾을 수 없습니다. ID: $id")
+
+    private fun evictCache() {
+        itemsByCategoryCache.invalidateAll()
+    }
 }

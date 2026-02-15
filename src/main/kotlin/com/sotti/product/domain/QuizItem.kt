@@ -18,6 +18,11 @@ import java.time.LocalDateTime
         name = "idx_deletedAt",
         def = "{'deletedAt': 1}",
     ),
+    CompoundIndex(
+        name = "idx_name_deletedAt_unique",
+        def = "{'name': 1, 'deletedAt': 1}",
+        unique = true,
+    ),
 )
 data class QuizItem(
     @Id

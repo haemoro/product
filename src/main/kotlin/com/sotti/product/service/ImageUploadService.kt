@@ -77,14 +77,27 @@ class ImageUploadService(
         targetWidth: Int,
         targetHeight: Int,
     ): BufferedImage {
-        val resized = BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB)
+        val origW = original.width
+        val origH = original.height
+
+        // 원본이 이미 목표 크기 이하이면 RGB 변환만
+        if (origW <= targetWidth && origH <= targetHeight) {
+            return toRgb(original)
+        }
+
+        // 비율 유지: targetWidth x targetHeight 안에 맞추기
+        val scale = minOf(targetWidth.toDouble() / origW, targetHeight.toDouble() / origH)
+        val newW = (origW * scale).toInt().coerceAtLeast(1)
+        val newH = (origH * scale).toInt().coerceAtLeast(1)
+
+        val resized = BufferedImage(newW, newH, BufferedImage.TYPE_INT_RGB)
         val g2d = resized.createGraphics()
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g2d.color = Color.WHITE
-        g2d.fillRect(0, 0, targetWidth, targetHeight)
-        g2d.drawImage(original, 0, 0, targetWidth, targetHeight, null)
+        g2d.fillRect(0, 0, newW, newH)
+        g2d.drawImage(original, 0, 0, newW, newH, null)
         g2d.dispose()
         return resized
     }

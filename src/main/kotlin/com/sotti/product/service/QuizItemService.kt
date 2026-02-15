@@ -22,6 +22,9 @@ class QuizItemService(
 ) {
     @Transactional
     fun createItem(request: CreateQuizItemRequest): QuizItemResponse {
+        require(quizItemRepository.findByNameAndDeletedAtIsNull(request.name) == null) {
+            "이미 등록된 퀴즈 아이템입니다. 이름: ${request.name}"
+        }
         val item =
             QuizItem(
                 categoryId = request.categoryId,

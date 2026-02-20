@@ -11,4 +11,6 @@ interface AppUserRepository : MongoRepository<AppUser, String> {
     fun findByDeviceId(deviceId: String): AppUser?
 
     fun findByActiveTrue(): List<AppUser>
+
+    fun findAllByOrderByUpdatedAtDesc(): List<AppUser>
 }

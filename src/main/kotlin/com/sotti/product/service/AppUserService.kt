@@ -39,7 +39,7 @@ class AppUserService(
 
     fun findByApiKey(apiKey: String): AppUser? = appUserRepository.findByApiKey(apiKey)
 
-    fun getAllUsers(): List<AppUserResponse> = appUserRepository.findAll().map { AppUserResponse.from(it) }
+    fun getAllUsers(): List<AppUserResponse> = appUserRepository.findAllByOrderByUpdatedAtDesc().map { AppUserResponse.from(it) }
 
     fun getUserById(id: String): AppUserResponse {
         val user =

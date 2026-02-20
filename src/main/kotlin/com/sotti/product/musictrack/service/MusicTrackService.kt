@@ -35,6 +35,7 @@ class MusicTrackService(
                 imageUrl = request.imageUrl,
                 category = request.category,
                 difficulty = request.difficulty,
+                status = request.status ?: TrackStatus.ACTIVE,
             )
         val saved = musicTrackRepository.save(track)
         return MusicTrackResponse.from(saved)

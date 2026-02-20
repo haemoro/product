@@ -43,6 +43,7 @@ out/
 .env
 .env.local
 .env.production
+.env.nas
 
 ### Local Config ###
 src/main/resources/application-local.yaml

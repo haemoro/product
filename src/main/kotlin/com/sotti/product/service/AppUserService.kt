@@ -29,6 +29,9 @@ class AppUserService(
                 nickname = request.nickname,
                 deviceId = request.deviceId,
                 platform = request.platform,
+                deviceModel = request.deviceModel,
+                osVersion = request.osVersion,
+                locale = request.locale,
             )
         val saved = appUserRepository.save(user)
         return RegisterUserResponse.from(saved)

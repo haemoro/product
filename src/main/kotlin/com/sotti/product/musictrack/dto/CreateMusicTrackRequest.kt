@@ -1,5 +1,6 @@
 package com.sotti.product.musictrack.dto
 
+import com.sotti.product.musictrack.domain.TrackStatus
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.PositiveOrZero
 
@@ -12,4 +13,5 @@ data class CreateMusicTrackRequest(
     val imageUrl: String? = null,
     val category: String? = null,
     val difficulty: String? = null,
+    val status: TrackStatus? = null,
 )

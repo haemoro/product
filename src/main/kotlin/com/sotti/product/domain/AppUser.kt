@@ -17,6 +17,9 @@ data class AppUser(
     @Indexed(unique = true, sparse = true)
     val deviceId: String? = null,
     val platform: String? = null,
+    val deviceModel: String? = null,
+    val osVersion: String? = null,
+    val locale: String? = null,
     val allowedCategoryIds: List<String> = emptyList(),
     val active: Boolean = true,
     @CreatedDate
